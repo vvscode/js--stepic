@@ -15,22 +15,43 @@ var readline = require('readline');
 var rl = readline.createInterface(process.stdin, process.stdout);
 var lines = [];
 
+var convertToMax = function(arr) {
+  var prevMaxVal;
+  var prevIndex;
+  return arr.map((item, index, arr) => {
+    var maxVal = !!index ? Math.max(item, prevMaxVal) : item;
+    var indexForMaxVal;
+    if(maxVal === prevMaxVal) {
+      indexForMaxVal = prevIndex;
+    } else {
+      indexForMaxVal = prevIndex = index;
+    }
+    prevMaxVal = maxVal;
+
+    return {
+      maxVal: maxVal,
+      indexForMaxVal: indexForMaxVal
+    }
+  });
+};
+
 function getAnswer() {
-  var arr1 = lines[1].split(' ').map((item) => +item);
+  var arr1WithMaxValues = convertToMax(lines[1].split(' ').map((item) => +item));
   var arr2 = lines[2].split(' ').map((item) => +item);
-  var maxSum = arr1[0] + arr2[0];
+  var maxSum = arr1WithMaxValues[0].maxVal + arr2[0];
   var maxSumIndex1 = 0;
   var maxSumIndex2 = 0;
-  for(var index2 =0; index2 < arr2.length; index2++) {
+  for(var index2 = 0; index2 < arr2.length; index2++) {
     var item2 = arr2[index2];
-    for(var index1 = 0; index1 <= index2; index1++) {
-      var item1 = arr1[index1];
-      var sum = item1 + item2;
-      if(sum > maxSum) {
-        maxSum = sum;
-        maxSumIndex1 = index1;
-        maxSumIndex2 = index2;
-      }
+
+    var item1 = arr1WithMaxValues[index2].maxVal;
+    var index1 = arr1WithMaxValues[index2].indexForMaxVal;
+
+    var sum = item1 + item2;
+    if(sum > maxSum) {
+      maxSum = sum;
+      maxSumIndex1 = index1;
+      maxSumIndex2 = index2;
     }
   }
 
